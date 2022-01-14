@@ -2,7 +2,6 @@
  * List handler for reservation resources
  */
 //require service file
-//require asyncErrorBoundary 
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary');
 //complete list function
 //valid date middleware
