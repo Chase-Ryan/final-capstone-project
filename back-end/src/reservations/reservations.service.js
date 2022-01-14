@@ -13,8 +13,15 @@ function listByDate(reservation_date) {
     .where({ reservation_date })
     .orderBy("reservations.reservation_time");
 }
+function create(reservation) {
+    return knex("restaurants")
+    .insert(reservation)
+    .returning("*")
+    .then((newReservation) => newReservation[0])
+}
 
 module.exports = {
     list,
     listByDate,
+    create,
 }

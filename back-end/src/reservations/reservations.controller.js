@@ -16,6 +16,14 @@ async function list(req, res) {
   });
 }
 
+async function create(req, res) {
+  const reservation = req.body.data;
+  const { reservation_id } = await service.create(reservation);
+  reservation.reservation_id = reservation_id;
+  res.status(201).json({ data: reservation });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
+  create: asyncErrorBoundary(create),
 };
