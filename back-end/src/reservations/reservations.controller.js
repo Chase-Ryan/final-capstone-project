@@ -3,6 +3,7 @@
  */
 //require service file
 //require asyncErrorBoundary 
+const asyncErrorBoundary = require('../errors/asyncErrorBoundary');
 //complete list function
 //valid date middleware
 
@@ -14,5 +15,5 @@ async function list(req, res) {
 }
 
 module.exports = {
-  list,
+  list: asyncErrorBoundary(list),
 };
