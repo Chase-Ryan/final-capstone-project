@@ -14,7 +14,7 @@ function listByDate(reservation_date) {
     .orderBy("reservations.reservation_time");
 }
 function create(reservation) {
-    return knex("restaurants")
+    return knex("reservations")
     .insert(reservation)
     .returning("*")
     .then((newReservation) => newReservation[0])
