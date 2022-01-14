@@ -3,7 +3,7 @@
  *
  * @type {Router}
  */
-
+//create and require methodNotAllowed file
 const router = require("express").Router();
 const controller = require("./reservations.controller");
 
