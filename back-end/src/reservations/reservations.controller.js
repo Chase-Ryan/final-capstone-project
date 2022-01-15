@@ -47,17 +47,18 @@ function hasValidTime(req, res, next) {
 
 function hasValidDate(req, res, next) {
   const {
-    data: { reservation_date },
+    data: { reservation_date, reservation_time },
   } = req.body;
 
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
-
+  
   if (!reservation_date.match(dateFormat)) {
     return next({
       status: 400,
       message: `the reservation_date must be a valid date in the format 'YYYY-MM-DD'`,
     });
   }
+
   next();
 }
 
