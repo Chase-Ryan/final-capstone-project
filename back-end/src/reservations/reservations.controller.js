@@ -49,64 +49,34 @@ function hasValidDate(req, res, next) {
   const {
     data: { reservation_date, reservation_time },
   } = req.body;
-
+  const tuesday = 2;
+  const submitDate = new Date(reservation_date);
+  const dayAsNumber = submitDate.getUTCDay();
+  const today = new Date();
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
   
   if (!reservation_date.match(dateFormat)) {
     return next({
       status: 400,
-      message: `the reservation_date must be a valid date in the format 'YYYY-MM-DD'`,
+      message: "the reservation_date must be a valid date in the format 'YYYY-MM-DD'",
+    });
+  }
+  if (dayAsNumber === tuesday) {
+    return next({
+      status: 400,
+      message: "The restaurant is closed on Tuesdays. Please select a different day.",
+    });
+  }
+  if (submitDate < today) {
+    return next({
+      status: 400,
+      message: "Must be a future date",
     });
   }
 
   next();
 }
-// function validateForm(req, res, next) {
-//   const { data } = req.body;
-//   if (!data) return next({ status: 400, message: "Data is missing" });
-//   const requiredFields = [
-//     "first_name",
-//     "last_name",
-//     "mobile_number",
-//     "reservation_date",
-//     "reservation_time",
-//     "people",
-//   ];
 
-//   requiredFields.forEach((field) => {
-//     if (!data[field]) {
-//       return next({
-//         status: 400,
-//         message: `Reservation must include a ${field}`,
-//       });
-//     }
-//   });
-
-//   if (!Number.isInteger(data.people)) {
-//     next({
-//       status: 400,
-//       message: "people must be a number",
-//     });
-//   }
-
-//   const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
-//   const timeFormat = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
-
-//   if (!data.reservation_date.match(dateFormat)) {
-//     return next({
-//       status: 400,
-//       message: `the reservation_date must be a valid date in the format 'YYYY-MM-DD'`,
-//     });
-//   }
-
-//   if (!data.reservation_time.match(timeFormat)) {
-//     return next({
-//       status: 400,
-//       message: `the reservation_time must be a valid date in the format '12:30'`,
-//     });
-//   }
-//   next();
-// }
 async function list(req, res) {
   const { date } = req.query;
   let data;
@@ -127,7 +97,6 @@ module.exports = {
     hasValidPeople,
     hasValidTime,
     hasValidDate,
-    // validateForm, 
     asyncErrorBoundary(create),
   ],
 };

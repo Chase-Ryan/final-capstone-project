@@ -1,6 +1,4 @@
 const knex = require('../db/connection');
-//list function to return reservations for one day
-//display error messages
 
 function list() {
     return knex("reservations")

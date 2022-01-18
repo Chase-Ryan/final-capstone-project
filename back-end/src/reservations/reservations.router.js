@@ -3,7 +3,6 @@
  *
  * @type {Router}
  */
-//create and require methodNotAllowed file
 const methodNotAllowed = require("../errors/methodNotAllowed");
 
 const router = require("express").Router();
