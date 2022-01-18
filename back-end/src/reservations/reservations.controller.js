@@ -36,12 +36,32 @@ function hasValidTime(req, res, next) {
   } = req.body;
   const validTimeFormat = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
 
+  if (!reservation_time) {
+    return next({
+      status: 400,
+      message: "Reservation time cannot be empty. Please select a time.",
+    })
+  }
   if (!reservation_time.match(validTimeFormat)) {
     return next({
       status: 400,
-      message: `the reservation_time must be a valid time in the format '12:30`,
+      message: "The reservation time must be a valid time in the format '12:30'",
     });
   }
+  if (reservation_time < "10:30:00") {
+    return next({
+      status: 400,
+      message: "The restaurant does not open until 10:30 a.m.",
+    })
+  } else {
+    if (reservation_time >= "21:30:00") {
+      return next({
+        status: 400,
+        message: "The restaurant closes at 10:30 p.m. Please schedule your reservation at least one hour before close.",
+      });
+    }
+  }
+
   next();
 }
 

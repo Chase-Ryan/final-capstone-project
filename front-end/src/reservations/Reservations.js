@@ -25,7 +25,6 @@ export default function Reservations(){
     async function handleSubmit(e){
         e.preventDefault();
         const controller = new AbortController();
-        //const errors = [];
         try {
             formData.people = Number(formData.people);
             await createReservation(formData, controller.signal);
