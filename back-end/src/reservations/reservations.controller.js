@@ -49,13 +49,28 @@ function hasValidDate(req, res, next) {
   const {
     data: { reservation_date, reservation_time },
   } = req.body;
-
+  const tuesday = 2;
+  const submitDate = new Date(reservation_date);
+  const dayAsNumber = submitDate.getUTCDay();
+  const today = new Date();
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
   
   if (!reservation_date.match(dateFormat)) {
     return next({
       status: 400,
-      message: `the reservation_date must be a valid date in the format 'YYYY-MM-DD'`,
+      message: "the reservation_date must be a valid date in the format 'YYYY-MM-DD'",
+    });
+  }
+  if (dayAsNumber === tuesday) {
+    return next({
+      status: 400,
+      message: "The restaurant is closed on Tuesdays. Please select a different day.",
+    });
+  }
+  if (submitDate < today) {
+    return next({
+      status: 400,
+      message: "Must be a future date",
     });
   }
 
@@ -82,7 +97,6 @@ module.exports = {
     hasValidPeople,
     hasValidTime,
     hasValidDate,
-    // validateForm, 
     asyncErrorBoundary(create),
   ],
 };
