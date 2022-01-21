@@ -20,8 +20,21 @@ function read(table_id) {
     .first();
 }
 
+function update(reservation_id, table_id) {
+    return knex("reservations")
+      .where({ reservation_id })
+      .update({ status: "seated" })
+      .then(() => {
+        return knex("tables")
+          .where({ table_id })
+          .update({ reservation_id })
+          .returning("*");
+      });
+  }
+
 module.exports = {
     list,
     create,
-    read
+    read,
+    update,
 };
