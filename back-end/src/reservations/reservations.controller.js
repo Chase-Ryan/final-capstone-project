@@ -93,8 +93,22 @@ function hasValidDate(req, res, next) {
       message: "Must be a future date",
     });
   }
-
   next();
+}
+
+async function reservationExists(req, res, next) {
+  const { reservationId } = req.params;
+  const reservation = await service.read(reservationId);
+
+  if (!reservation) {
+    return next({
+      status: 404,
+      message: `No reservation found for id: ${reservationId}`,
+    });
+  } else {
+    res.locals.reservation = reservation;
+    return next();
+  }
 }
 
 async function list(req, res) {
@@ -110,6 +124,12 @@ async function create(req, res) {
   res.status(201).json({ data });
 }
 
+async function read(req, res) {
+  const { reservation } = res.locals;
+  const data = await service.read(reservation.reservation_id);
+  res.json({ data });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -119,4 +139,5 @@ module.exports = {
     hasValidDate,
     asyncErrorBoundary(create),
   ],
+  read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
 };
