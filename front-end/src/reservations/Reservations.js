@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { useHistory } from "react-router";
 import { createReservation } from "../utils/api";
-import Form from "./Form";
+import Form from "./ReservationForm";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function Reservations(){
