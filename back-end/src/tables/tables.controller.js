@@ -100,10 +100,10 @@ function validateTableSeating(req, res, next) {
   }
 function validateOccupation(req, res, next) {
     const { table } = res.locals;
-    if (table.reservation_id) {
+    if (table.reservation_id === null) {
       return next({
         status: 400,
-        message: "Table is occupied.",
+        message: "Table is not occupied.",
       });
     }
     next();
@@ -140,7 +140,7 @@ async function destroy(req, res) {
   const { table_id } = req.params;
   const { table } = res.locals;
 
-  await tablesService.clearTable(table_id, table.reservation_id);
+  await service.clearTable(table_id, table.reservation_id);
   res.status(200).json({});
 }
 
@@ -161,7 +161,6 @@ module.exports = {
     validateSeated,
     validateTableSeating,
     tableIsFree,
-    validateOccupation,
     asyncErrorBoundary(update),
   ],
   delete: [
