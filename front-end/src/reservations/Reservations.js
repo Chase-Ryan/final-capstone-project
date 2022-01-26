@@ -1,48 +1,37 @@
 import React, {useState} from "react";
 import { useHistory } from "react-router";
-import { createReservation } from "../utils/api";
-import Form from "./Form";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function Reservations(){
+export default function Reservations({ reservation }){
+
     const history = useHistory();
-    const [reservationsError, setReservationsError] = useState(null);
-    const initialFormData = {
-    first_name: "",
-    last_name: "",
-    mobile_number: "",
-    reservation_date: "",
-    reservation_time: "",
-    people: 0,
+    const [error, setError] = useState(null);
+    function handleCancel() {
+        history.goBack();
     }
-    const [formData, setFormData] = useState({...initialFormData});
-    function handleFormChange(e){
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-    async function handleSubmit(e){
-        e.preventDefault();
-        const controller = new AbortController();
-        try {
-            formData.people = Number(formData.people);
-            await createReservation(formData, controller.signal);
-            const date = formData.reservation_date;
-            history.push(`/dashboard?date=${date}`);
-        } catch (error) {
-            setReservationsError(error);
-        }
-        return () => controller.abort();
-    }
+    
     return (
         <>
-        <ErrorAlert error={reservationsError} />
-        <Form
-        initialFormData={formData}
-        handleFormChange={handleFormChange}
-        handleSubmit={handleSubmit}
-        />
+        <ErrorAlert error={error} />
+            <div>
+                <h2>{reservation.first_name} {reservation.last_name}</h2>
+                <p>Mobile Number: {reservation.mobile_number}</p>
+                <p>Reservation Date:{" "} {reservation.reservation_date}</p>
+                <p>Reservation Time: {reservation.reservation_time}</p>
+                <p>People: {reservation.people}</p>
+                <p data-reservation-id-status={`${reservation.reservation_id}`}>
+                    Status: {reservation.status}
+                </p>
+                <div>
+                    {reservation.status === "booked" && (
+                        <a href={`/reservations/${reservation.reservation_id}/seat`}>
+                            <button>
+                                Seat
+                            </button>
+                        </a>
+                    )}
+                </div>
+            </div>
         </>
     );
 }
