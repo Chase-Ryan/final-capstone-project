@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useLocation, useHistory } from "react-router-dom";
 import { previous, next, today } from "../utils/date-time";
+import ReservationsList from "../reservations/ReservationsList";
+import TableList from "../tables/TableList";
+
 /**
  * Defines the dashboard page.
  * @param date
@@ -16,30 +19,42 @@ function Dashboard() {
   const query = useQuery();
   const history = useHistory();
   const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
+  const [tables, setTables] = useState([]);
+  const [error, setError] = useState(null);
   const [date, setDate] = useState(query.get("date") || today());
   
   useEffect(loadDashboard, [date]);
+  useEffect(loadTables, []);
 
   function loadDashboard() {
     const abortController = new AbortController();
-    setReservationsError(null); 
+    setError(null); 
     listReservations({ date }, abortController.signal)
       .then(setReservations)
-      .catch(setReservationsError);
+      .catch(setError);
+    return () => abortController.abort();
+  }
+  function loadTables() {
+    const abortController = new AbortController();
+    setError(null);
+    listTables(abortController.signal).then(setTables).catch(setError);
     return () => abortController.abort();
   }
 
-  const handlePreviousDate = () => {
-    setDate(previous(date));
+  function handlePreviousDate() {
+    setDate((date) => previous(date));
     history.push(`dashboard?date=${previous(date)}`);
   };
 
-  const handleNextDate = () => {
-    setDate(next(date));
+  function handleNextDate() {
+    setDate((date) => next(date));
     history.push(`dashboard?date=${next(date)}`);
   };
 
+  function handleToday() {
+    setDate(today());
+    history.push(`dashboard?date=${today()}`)
+  }
   return (
     <main>
       <h1>Dashboard</h1>
@@ -47,18 +62,30 @@ function Dashboard() {
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
       <div>
-        <button onClick={() => setDate(today())}>
-          Today
-        </button>
         <button onClick={handlePreviousDate}>
           Previous
+        </button>
+        <button onClick={handleToday}>
+          Today
         </button>
         <button onClick={handleNextDate}>
           Next
         </button>
       </div>
-      <ErrorAlert error={reservationsError} />
-      {JSON.stringify(reservations)}
+      <ErrorAlert error={error} />
+      <ReservationsList reservations={reservations} />
+      <h2>Tables</h2>
+      {tables && (
+        <div>
+          {tables.map((table) => (
+            <TableList
+              key={table.table_id}
+              table={table}
+              loadDashboard={loadDashboard}
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 }

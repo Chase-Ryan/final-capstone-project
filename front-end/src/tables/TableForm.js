@@ -42,8 +42,8 @@ export default function TableForm() {
 }
   return (
     <div>
-      <h2>Create a table</h2>
       <ErrorAlert error={tablesError} />
+      <h2>Create a table</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="table_name">Table Name</label>
