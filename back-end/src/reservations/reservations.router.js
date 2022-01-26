@@ -9,7 +9,7 @@ const router = require("express").Router();
 const controller = require("./reservations.controller");
 
 router
-  .route("/:reservationId")
+  .route("/:reservation_id")
   .get(controller.read)
   .all(methodNotAllowed);
 

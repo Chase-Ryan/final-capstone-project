@@ -97,13 +97,13 @@ function hasValidDate(req, res, next) {
 }
 
 async function reservationExists(req, res, next) {
-  const { reservationId } = req.params;
-  const reservation = await service.read(reservationId);
+  const { reservation_id } = req.params;
+  const reservation = await service.read(reservation_id);
 
   if (!reservation) {
     return next({
       status: 404,
-      message: `No reservation found for id: ${reservationId}`,
+      message: `No reservation found for id: ${reservation_id}`,
     });
   } else {
     res.locals.reservation = reservation;
