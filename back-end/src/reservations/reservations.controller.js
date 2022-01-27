@@ -40,24 +40,26 @@ function hasValidTime(req, res, next) {
     return next({
       status: 400,
       message: "Reservation time cannot be empty. Please select a time.",
-    })
+    });
   }
   if (!reservation_time.match(validTimeFormat)) {
     return next({
       status: 400,
-      message: "The reservation time must be a valid time in the format '12:30'",
+      message:
+        "The reservation time must be a valid time in the format '12:30'",
     });
   }
   if (reservation_time < "10:30:00") {
     return next({
       status: 400,
       message: "The restaurant does not open until 10:30 a.m.",
-    })
+    });
   } else {
     if (reservation_time >= "21:30:00") {
       return next({
         status: 400,
-        message: "The restaurant closes at 10:30 p.m. Please schedule your reservation at least one hour before close.",
+        message:
+          "The restaurant closes at 10:30 p.m. Please schedule your reservation at least one hour before close.",
       });
     }
   }
@@ -74,17 +76,19 @@ function hasValidDate(req, res, next) {
   const dayAsNumber = submitDate.getUTCDay();
   const today = new Date();
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
-  
+
   if (!reservation_date.match(dateFormat)) {
     return next({
       status: 400,
-      message: "the reservation_date must be a valid date in the format 'YYYY-MM-DD'",
+      message:
+        "the reservation_date must be a valid date in the format 'YYYY-MM-DD'",
     });
   }
   if (dayAsNumber === tuesday) {
     return next({
       status: 400,
-      message: "The restaurant is closed on Tuesdays. Please select a different day.",
+      message:
+        "The restaurant is closed on Tuesdays. Please select a different day.",
     });
   }
   if (submitDate < today) {
@@ -111,6 +115,42 @@ async function reservationExists(req, res, next) {
   }
 }
 
+function statusCheck(req, res, next) {
+  const { status } = req.body.data;
+  const validStatus = ["booked", "seated", "finished", "cancelled"];
+  if (!validStatus.includes(status)) {
+    return next({
+      status: 400,
+      message: `The status must be either ${validStatus.join(
+        ","
+      )}. You entered ${status}`,
+    });
+  }
+  next();
+}
+
+function bookedCheck(req, res, next) {
+  const { status } = req.body.data;
+  if (status && status !== "booked") {
+    return next({
+      status: 400,
+      message: `A new reservation cannot have a status of ${status}`,
+    });
+  }
+  next();
+}
+
+function finishCheck(req, res, next) {
+  const { status } = res.locals.reservation;
+  if (status === "finished") {
+    return next({
+      status: 400,
+      message: "Reservation status is currently finished and cannot be changed",
+    });
+  }
+  next();
+}
+
 async function list(req, res) {
   const { date } = req.query;
   let data;
@@ -130,6 +170,13 @@ async function read(req, res) {
   res.json({ data });
 }
 
+async function updateStatus(req, res) {
+  const { reservation_id } = res.locals.reservation;
+  const { status } = req.body.data;
+  const data = await service.statusUpdate(reservation_id, status);
+  res.json({ data });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -137,7 +184,14 @@ module.exports = {
     hasValidPeople,
     hasValidTime,
     hasValidDate,
+    bookedCheck,
     asyncErrorBoundary(create),
   ],
   read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
+  updateStatus: [
+    asyncErrorBoundary(reservationExists),
+    statusCheck,
+    finishCheck,
+    asyncErrorBoundary(updateStatus),
+  ],
 };
