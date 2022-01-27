@@ -152,10 +152,10 @@ function finishCheck(req, res, next) {
 }
 
 async function list(req, res) {
-  const { date } = req.query;
+  const { date, mobile_number } = req.query;
   let data;
 
-  data = date ? await service.listByDate(date) : await service.list();
+  data = date ? await service.listByDate(date) : mobile_number ? await service.search(mobile_number) : await service.list();
   res.json({ data });
 }
 

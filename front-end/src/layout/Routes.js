@@ -6,6 +6,7 @@ import NotFound from "./NotFound";
 import ReservationForm from "../reservations/ReservationForm";
 import TableForm from "../tables/TableForm";
 import SeatReservation from "../reservations/SeatReservation";
+import NumberSearch from "../numberSearch/NumberSearch";
 
 
 /**
@@ -32,6 +33,9 @@ function Routes() {
       </Route>
       <Route exact={true} path="/tables/new">
         <TableForm />
+      </Route>
+      <Route exact={true} path="/search">
+        <NumberSearch />
       </Route>
       <Route path="/dashboard">
         <Dashboard />
