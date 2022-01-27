@@ -4,8 +4,7 @@
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const service = require("./reservations.service");
 const hasProperties = require("../errors/hasProperties");
-//complete list function
-//valid date middleware
+
 const hasRequiredProperties = hasProperties(
   "first_name",
   "last_name",
@@ -46,7 +45,7 @@ function hasValidTime(req, res, next) {
     return next({
       status: 400,
       message:
-        "The reservation time must be a valid time in the format '12:30'",
+        "The reservation_time must be a valid time in the format '12:30'",
     });
   }
   if (reservation_time < "10:30:00") {
@@ -155,7 +154,11 @@ async function list(req, res) {
   const { date, mobile_number } = req.query;
   let data;
 
-  data = date ? await service.listByDate(date) : mobile_number ? await service.search(mobile_number) : await service.list();
+  data = date
+    ? await service.listByDate(date)
+    : mobile_number
+    ? await service.search(mobile_number)
+    : await service.list();
   res.json({ data });
 }
 
@@ -167,6 +170,17 @@ async function create(req, res) {
 async function read(req, res) {
   const { reservation } = res.locals;
   const data = await service.read(reservation.reservation_id);
+  res.json({ data });
+}
+
+async function update(req, res) {
+  const { reservation_id } = res.locals.reservation;
+
+  const updatedReservation = {
+    ...req.body.data,
+    reservation_id,
+  };
+  const data = await service.update(updatedReservation);
   res.json({ data });
 }
 
@@ -188,6 +202,15 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
+  update: [
+    asyncErrorBoundary(reservationExists),
+    hasRequiredProperties,
+    hasValidPeople,
+    hasValidTime,
+    hasValidDate,
+    bookedCheck,
+    asyncErrorBoundary(update),
+  ],
   updateStatus: [
     asyncErrorBoundary(reservationExists),
     statusCheck,
