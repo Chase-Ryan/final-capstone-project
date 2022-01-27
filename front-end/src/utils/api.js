@@ -104,6 +104,16 @@ export async function updateReservation(reservation, signal) {
   return await fetchJson(url, options, reservation);
 }
 
+export async function cancelReservation(reservationId, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservationId}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: { status: "cancelled" } }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
 
 export async function listTables(signal) {
   const url = `${API_BASE_URL}/tables`;
