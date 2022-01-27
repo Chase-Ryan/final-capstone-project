@@ -34,7 +34,6 @@ function search(mobile_number) {
       "translate(mobile_number, '() -', '') like ?",
       `%${mobile_number.replace(/\D/g, "")}%`
     )
-    .whereNot({ status: "cancelled" })
     .orderBy("reservation_date");
 }
 module.exports = {
