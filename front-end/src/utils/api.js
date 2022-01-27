@@ -89,7 +89,6 @@ export async function readReservation(reservation_id, signal) {
     headers,
     signal,
   };
-  // format reservation date so it's usable on the edit form
   return await fetchJson(url, options)
     .then(formatReservationDate);
 }

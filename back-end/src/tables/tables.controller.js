@@ -91,7 +91,7 @@ function validateTableSeating(req, res, next) {
     const people = res.locals.reservation.people;
     const capacity = res.locals.table.capacity;
     if (people > capacity) {
-      next({
+      return next({
         status: 400,
         message: `The party size is greater than the table capacity. Please select another table.`,
       });
