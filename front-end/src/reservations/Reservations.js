@@ -10,6 +10,7 @@ export default function Reservations({ reservation }){
         history.goBack();
     }
     
+    
     return (
         <>
         <ErrorAlert error={error} />

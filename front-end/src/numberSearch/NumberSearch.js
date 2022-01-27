@@ -47,7 +47,7 @@ export default function NumberSearch() {
           required
         />
       <button type="submit">
-        Search
+        Find
       </button>
       </form>
       {reservations.length > 0 && (

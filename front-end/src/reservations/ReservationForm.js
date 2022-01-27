@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router";
 import ErrorAlert from "../layout/ErrorAlert";
-import { createReservation, readReservation } from "../utils/api";
+import { createReservation, readReservation, updateReservation } from "../utils/api";
 
 export default function Form() {
   const history = useHistory();
@@ -54,9 +54,15 @@ export default function Form() {
     e.preventDefault();
     const controller = new AbortController();
     try {
+      if (reservation_id) {
+        await updateReservation(formData, controller.signal);
+      history.push(`/dashboard?date=${formData.reservation_date}`);
+      setFormData({ ...initialFormState });
+      } else {
       await createReservation(formData, controller.signal);
       history.push(`/dashboard?date=${formData.reservation_date}`);
       setFormData({ ...initialFormState });
+      }
     } catch (err) {
       setError(err);
     }
@@ -69,6 +75,11 @@ export default function Form() {
 
   return (
     <>
+      {reservation_id ? (
+        <h2>Edit a Reservation</h2>
+      ) : (
+        <h2>Create a Reservation</h2>
+      )}
       <ErrorAlert error={error} />
       <form onSubmit={handleSubmit}>
         <fieldset>
