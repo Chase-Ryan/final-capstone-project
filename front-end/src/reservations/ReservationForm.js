@@ -19,13 +19,13 @@ export default function Form() {
   const [formData, setFormData] = useState({ ...initialFormState });
 
   useEffect(() => {
-    const abortController = new AbortController();
+    const controller = new AbortController();
     async function loadReservation() {
       try {
         if (reservation_id) {
           const response = await readReservation(
             reservation_id,
-            abortController.signal
+            controller.signal
           );
           setFormData(response);
         }
@@ -35,7 +35,7 @@ export default function Form() {
     }
     loadReservation();
 
-    return () => abortController.abort();
+    return () => controller.abort();
   }, [reservation_id]);
 
   function handleFormChange(e) {
@@ -52,15 +52,15 @@ export default function Form() {
   }
   async function handleSubmit(e) {
     e.preventDefault();
-    const abortController = new AbortController();
+    const controller = new AbortController();
     try {
-      await createReservation(formData, abortController.signal);
+      await createReservation(formData, controller.signal);
       history.push(`/dashboard?date=${formData.reservation_date}`);
       setFormData({ ...initialFormState });
     } catch (err) {
       setError(err);
     }
-    return () => abortController.abort();
+    return () => controller.abort();
   }
 
   function handleCancel() {
