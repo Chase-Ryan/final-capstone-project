@@ -3,6 +3,7 @@ const service = require("./tables.service");
 const hasProperties = require("../errors/hasProperties");
 const reservationService = require("../reservations/reservations.service");
 
+//Validation
 const hasRequiredProperties = hasProperties("table_name", "capacity");
 const hasRequiredUpdateProperties = hasProperties("reservation_id");
 
@@ -30,6 +31,7 @@ function hasValidName(req, res, next) {
   next();
 }
 
+//new table has to have capacity of at least 1
 function hasCapacity(req, res, next) {
   const {
     data: { capacity },
@@ -46,7 +48,6 @@ function hasCapacity(req, res, next) {
 async function tableExists(req, res, next) {
   const { table_id } = req.params;
   const table = await service.read(table_id);
-
   if (table) {
     res.locals.table = table;
     return next();
@@ -77,37 +78,42 @@ async function reservationExists(req, res, next) {
     });
   }
 }
+
 function validateSeated(req, res, next) {
-    const { status } = res.locals.reservation;
-    if (status === "seated") {
-      return next({
-        status: 400,
-        message: `This reservation is already seated at a table!`,
-      });
-    }
-    next();
+  const { status } = res.locals.reservation;
+  if (status === "seated") {
+    return next({
+      status: 400,
+      message: `This reservation is already seated at a table!`,
+    });
   }
+  next();
+}
+
+//compares number of people in reservation to capacity of table
 function validateTableSeating(req, res, next) {
-    const people = res.locals.reservation.people;
-    const capacity = res.locals.table.capacity;
-    if (people > capacity) {
-      return next({
-        status: 400,
-        message: `The party size is greater than the table capacity. Please select another table.`,
-      });
-    }
-    next();
+  const people = res.locals.reservation.people;
+  const capacity = res.locals.table.capacity;
+  if (people > capacity) {
+    return next({
+      status: 400,
+      message: `The party size is greater than the table capacity. Please select another table.`,
+    });
   }
+  next();
+}
+
+//checks if table is currently occupied by seeing if it has a reservation_id
 function validateOccupation(req, res, next) {
-    const { table } = res.locals;
-    if (table.reservation_id === null) {
-      return next({
-        status: 400,
-        message: "Table is not occupied.",
-      });
-    }
-    next();
+  const { table } = res.locals;
+  if (table.reservation_id === null) {
+    return next({
+      status: 400,
+      message: "Table is not occupied.",
+    });
   }
+  next();
+}
 
 function tableIsFree(req, res, next) {
   const occupied = res.locals.table.reservation_id;
@@ -120,6 +126,7 @@ function tableIsFree(req, res, next) {
   next();
 }
 
+//CRUDL
 async function list(req, res) {
   const data = await service.list();
   res.json({ data });
@@ -131,10 +138,10 @@ async function create(req, res) {
 }
 
 async function update(req, res, next) {
-    const { reservation_id } = req.body.data;
-    const table_id = Number(req.params.table_id);
-    const data = await service.update(reservation_id, table_id);
-    res.json({ data });
+  const { reservation_id } = req.body.data;
+  const table_id = Number(req.params.table_id);
+  const data = await service.update(reservation_id, table_id);
+  res.json({ data });
 }
 async function destroy(req, res) {
   const { table_id } = req.params;

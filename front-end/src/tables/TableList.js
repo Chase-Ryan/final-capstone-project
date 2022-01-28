@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { listReservations, clearTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom";
+import "./Tables.css";
+import Button from 'react-bootstrap/Button';
 
 export default function TableList({ table, loadDashboard }) {
   const [reservations, setReservations] = useState([]);
@@ -31,9 +33,10 @@ export default function TableList({ table, loadDashboard }) {
     }
   }
   return (
-    <>
+    <div className="table">
       <ErrorAlert error={error} />
-      <h3>Name: {table.table_name}</h3>
+      <h4 className="table-name text-center">Name: {table.table_name}</h4>
+      <hr />
       <p>Capacity: {table.capacity}</p>
       <p data-table-id-status={`${table.table_id}`}>
         Status:{" "}
@@ -45,14 +48,14 @@ export default function TableList({ table, loadDashboard }) {
         )}
       </p>
       {table.reservation_id && (
-        <button
+        <Button
           type="submit"
           data-table-id-finish={`${table.table_id}`}
           onClick={() => handleFinish(table.table_id)}
         >
           Finish
-        </button>
+        </Button>
       )}
-    </>
+    </div>
   );
 }

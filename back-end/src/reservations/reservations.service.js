@@ -5,6 +5,7 @@ function list() {
     .select("*")
     .orderBy("reservations.reservation_date");
 }
+
 function listByDate(reservation_date) {
   return knex("reservations")
     .select("*")
@@ -13,18 +14,20 @@ function listByDate(reservation_date) {
     .whereNot({ status: "cancelled" })
     .orderBy("reservations.reservation_time");
 }
+
 function create(reservation) {
   return knex("reservations")
     .insert(reservation)
     .returning("*")
     .then((newReservation) => newReservation[0]);
 }
+
 function read(reservation_id) {
   return knex("reservations").select("*").where({ reservation_id }).first();
 }
 
 function update(updatedReservation) {
-    return knex("reservations")
+  return knex("reservations")
     .select("*")
     .where({ reservation_id: updatedReservation.reservation_id })
     .update(updatedReservation, "*")

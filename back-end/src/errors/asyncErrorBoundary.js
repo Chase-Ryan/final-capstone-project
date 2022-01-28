@@ -1,3 +1,4 @@
+//function to go around async functions in controller files
 function asyncErrorBoundary(delegate, defaultStatus) {
     return (request, response, next) => {
       Promise.resolve()

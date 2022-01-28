@@ -14,4 +14,4 @@ export default function ReservationsList({ reservations }) {
       </div>
     </div>
   );
-};
+}

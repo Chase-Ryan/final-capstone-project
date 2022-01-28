@@ -47,5 +47,10 @@
   },
   "keywords": [],
   "author": "Thinkful, Inc.",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@material/button": "^13.0.0",
+    "semantic-ui-button": "^2.3.2",
+    "semantic-ui-css": "^2.4.1"
+  }
 }

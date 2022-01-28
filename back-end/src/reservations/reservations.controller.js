@@ -1,19 +1,18 @@
-/**
- * List handler for reservation resources
- */
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const service = require("./reservations.service");
 const hasProperties = require("../errors/hasProperties");
 
+//Validation
 const hasRequiredProperties = hasProperties(
   "first_name",
   "last_name",
   "mobile_number",
   "reservation_date",
   "reservation_time",
-  "people"
+  "people",
 );
 
+//res must have at least one person
 function hasValidPeople(req, res, next) {
   const {
     data: { people },
@@ -25,10 +24,10 @@ function hasValidPeople(req, res, next) {
       message: "'people' value must be greater than 0 and be a number",
     });
   }
-
   next();
 }
 
+//res time must fit form and business rules
 function hasValidTime(req, res, next) {
   const {
     data: { reservation_time },
@@ -48,12 +47,14 @@ function hasValidTime(req, res, next) {
         "The reservation_time must be a valid time in the format '12:30'",
     });
   }
+  //restaurant is closed until 10:30 a.m.
   if (reservation_time < "10:30:00") {
     return next({
       status: 400,
       message: "The restaurant does not open until 10:30 a.m.",
     });
   } else {
+    //restaurant closes at 10:30 p.m. so reservation must be at least one hour before
     if (reservation_time >= "21:30:00") {
       return next({
         status: 400,
@@ -62,16 +63,16 @@ function hasValidTime(req, res, next) {
       });
     }
   }
-
   next();
 }
 
+//res must have valid format and fit business rules
 function hasValidDate(req, res, next) {
   const {
     data: { reservation_date, reservation_time },
   } = req.body;
   const tuesday = 2;
-  const submitDate = new Date(reservation_date);
+  const submitDate = new Date(reservation_date + " " + reservation_time);
   const dayAsNumber = submitDate.getUTCDay();
   const today = new Date();
   const dateFormat = /\d\d\d\d-\d\d-\d\d/;
@@ -83,6 +84,7 @@ function hasValidDate(req, res, next) {
         "the reservation_date must be a valid date in the format 'YYYY-MM-DD'",
     });
   }
+  //restaurant is closed on tuesday, checks day of the week
   if (dayAsNumber === tuesday) {
     return next({
       status: 400,
@@ -90,6 +92,7 @@ function hasValidDate(req, res, next) {
         "The restaurant is closed on Tuesdays. Please select a different day.",
     });
   }
+  //to prevent reservations in the past
   if (submitDate < today) {
     return next({
       status: 400,
@@ -117,6 +120,7 @@ async function reservationExists(req, res, next) {
 function statusCheck(req, res, next) {
   const { status } = req.body.data;
   const validStatus = ["booked", "seated", "finished", "cancelled"];
+  //status must be one of the above valid statuses
   if (!validStatus.includes(status)) {
     return next({
       status: 400,
@@ -128,6 +132,7 @@ function statusCheck(req, res, next) {
   next();
 }
 
+//new reservations should have a booked status
 function bookedCheck(req, res, next) {
   const { status } = req.body.data;
   if (status && status !== "booked") {
@@ -139,6 +144,7 @@ function bookedCheck(req, res, next) {
   next();
 }
 
+//prevents updating reservation if status is finished
 function finishCheck(req, res, next) {
   const { status } = res.locals.reservation;
   if (status === "finished") {
@@ -150,10 +156,12 @@ function finishCheck(req, res, next) {
   next();
 }
 
+//CRUDL
 async function list(req, res) {
   const { date, mobile_number } = req.query;
   let data;
 
+  // checks if query is date or mobile_number and changes data accordingly
   data = date
     ? await service.listByDate(date)
     : mobile_number
@@ -184,6 +192,7 @@ async function update(req, res) {
   res.json({ data });
 }
 
+//update reservation status
 async function updateStatus(req, res) {
   const { reservation_id } = res.locals.reservation;
   const { status } = req.body.data;

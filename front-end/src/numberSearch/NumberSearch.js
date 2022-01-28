@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { listReservations } from "../utils/api";
 import ReservationsList from "../reservations/ReservationsList";
 import ErrorAlert from "../layout/ErrorAlert";
-
+import "./NumberSearch.css";
+import Button from 'react-bootstrap/Button';
 
 export default function NumberSearch() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -35,29 +36,30 @@ export default function NumberSearch() {
 
   return (
     <>
-      <h2>Search by Phone Number</h2>
       <ErrorAlert error={error} />
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="mobile_number"
-          value={phoneNumber}
-          onChange={handleChange}
-          placeholder="number"
-          required
-        />
-      <button type="submit">
-        Find
-      </button>
+      <form onSubmit={handleSubmit} className="text-center">
+        <h2 className="search-header">Search by Phone Number</h2>
+          <input
+            type="text"
+            name="mobile_number"
+            value={phoneNumber}
+            onChange={handleChange}
+            placeholder="Number"
+            required
+            className="search-input"
+          />
+          <Button type="submit">
+            Search
+          </Button>
       </form>
       {reservations.length > 0 && (
         <ReservationsList reservations={reservations} />
       )}
       {noResults && reservations.length === 0 ? (
-        <h3>No reservations found</h3>
+        <h3 className="text-center">No reservations found</h3>
       ) : (
         ""
       )}
     </>
   );
-};
+}

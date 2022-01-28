@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { cancelReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import "./Reservations.css";
+import Button from "react-bootstrap/Button";
 
 export default function Reservations({ reservation }) {
   const history = useHistory();
@@ -25,8 +27,8 @@ export default function Reservations({ reservation }) {
     <>
       <ErrorAlert error={error} />
       {reservation.status !== "finished" && (
-        <div>
-          <h2>
+        <div className="reservation text-center">
+          <h2 className="reservation-name">
             {reservation.first_name} {reservation.last_name}
           </h2>
           <p>Mobile Number: {reservation.mobile_number}</p>
@@ -36,21 +38,21 @@ export default function Reservations({ reservation }) {
           <p data-reservation-id-status={`${reservation.reservation_id}`}>
             Status: {reservation.status}
           </p>
-          <div>
+          <div className="reservation-btns">
             <a href={`/reservations/${reservation.reservation_id}/edit`}>
-              <button>Edit</button>
+              <Button>Edit</Button>
             </a>
             {reservation.status === "booked" && (
               <a href={`/reservations/${reservation.reservation_id}/seat`}>
-                <button>Seat</button>
+                <Button>Seat</Button>
               </a>
             )}
-            <button
+            <Button
               onClick={() => handleCancel(reservation.reservation_id)}
               data-reservation-id-cancel={`${reservation.reservation_id}`}
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}

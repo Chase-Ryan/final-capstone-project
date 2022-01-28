@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
 import { createTable } from "../utils/api";
 import { useHistory } from "react-router-dom";
+import "./Tables.css";
+import Button from 'react-bootstrap/Button';
 
 export default function TableForm() {
   const [tablesError, setTablesError] = useState(null);
@@ -41,11 +43,11 @@ export default function TableForm() {
     history.goBack();
 }
   return (
-    <div>
+    <>
       <ErrorAlert error={tablesError} />
-      <h2>Create a table</h2>
+      <h2 className="text-center create-header">Create a table</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+      <div className="form-group">
           <label htmlFor="table_name">Table Name</label>
           <input
             type="text"
@@ -56,6 +58,7 @@ export default function TableForm() {
             onChange={handleFormChange}
             minLength={2}
             required
+            className="form-control"
           />
           <label htmlFor="capacity">Capacity</label>
           <input
@@ -67,15 +70,18 @@ export default function TableForm() {
             value={formData.capacity}
             onChange={handleNumberInput}
             required
+            className="form-control"
           />
         </div>
-        <button onClick={handleCancle}>
+        <div className="text-center">
+        <Button className="cancel-btn" onClick={handleCancle}>
           Cancel
-        </button>
-        <button type="submit" >
+        </Button>
+        <Button type="submit" className="submit-btn">
           Submit
-        </button>
+        </Button>
+        </div>
       </form>
-    </div>
+    </>
   );
 }
